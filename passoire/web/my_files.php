@@ -22,8 +22,11 @@ if (isset($_POST['delete']) && isset($_POST['file_id'])) {
     $file = $stmt->fetch();*/
     
     
-		$sql = "SELECT path FROM files WHERE id = " . $file_id . " AND ownerid = " . $user_id . "";
-		$result = $conn->query($sql);
+		$stmt = $conn->prepare("SELECT path FROM files WHERE id = ? AND ownerid = ?");
+		$stmt->bind_param("ii", $file_id, $user_id);
+		$stmt->execute();
+		$result = $stmt->get_result();
+		$stmt->close();
 		if ($result->num_rows > 0) {
 				// Fetch the first row of results into an array
 				$file = $result->fetch_assoc();
@@ -40,15 +43,19 @@ if (isset($_POST['delete']) && isset($_POST['file_id'])) {
         //$stmt = $pdo->prepare("DELETE FROM files WHERE id = :file_id AND ownerid = :user_id");
         //$stmt->execute(['file_id' => $file_id, 'user_id' => $user_id]);
         
-				$sql = "DELETE FROM files WHERE id = " . $file_id . " AND ownerid = " . $user_id . "";
-				$conn->query($sql);
+				$stmt = $conn->prepare("DELETE FROM files WHERE id = ? AND ownerid = ?");
+				$stmt->bind_param("ii", $file_id, $user_id);
+				$stmt->execute();
+				$stmt->close();
 
         // Also delete from the links table
         //$stmt = $pdo->prepare("DELETE FROM links WHERE fileid = :file_id");
         //$stmt->execute(['file_id' => $file_id]);
         
-				$sql = "DELETE FROM links WHERE fileid = " . $file_id . "";
-				$conn->query($sql);
+				$stmt = $conn->prepare("DELETE FROM links WHERE fileid = ?");
+				$stmt->bind_param("i", $file_id);
+				$stmt->execute();
+				$stmt->close();
 
         echo "File deleted successfully.";
     }
@@ -60,8 +67,12 @@ if (isset($_POST['delete']) && isset($_POST['file_id'])) {
 $stmt->execute(['user_id' => $user_id]);
 $files = $stmt->fetchAll();*/
 
-$sql = "SELECT f.id, f.path, f.type, f.date, f.ownerid, l.hash FROM files f JOIN links l ON f.id = l.fileid WHERE f.ownerid = " . $user_id;
-$result = $conn->query($sql);
+$stmt = $conn->prepare("SELECT f.id, f.path, f.type, f.date, f.ownerid, l.hash FROM files f JOIN links l ON f.id = l.fileid WHERE f.ownerid = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+
 $files = [];
 if ($result->num_rows > 0) {
 	  // Fetch all rows and store them in an array

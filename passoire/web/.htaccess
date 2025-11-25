@@ -4,6 +4,6 @@
 </Files>
 
 # 禁止访问 uploads 目录
-<Directory "/full/path/to/web/uploads">
+<Directory "./web/uploads">
   Require all denied
 </Directory>

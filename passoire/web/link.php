@@ -15,10 +15,12 @@ $hash = $_GET['file'];
 
 // Prepare and execute a query to find the corresponding file for the given hash
 
-$sql = "SELECT f.path, f.type FROM links l JOIN files f ON l.fileid = f.id WHERE l.hash = \"" . $hash . "\" LIMIT 1";
-
+$stmt = $conn->prepare("SELECT f.path, f.type FROM links l JOIN files f ON l.fileid = f.id WHERE l.hash = ? LIMIT 1");
 // Execute query
-$result = $conn->query($sql);
+$stmt->bind_param("s", $hash);
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
 
 if ($result->num_rows > 0) {
 		// Fetch the first row of results into an array
