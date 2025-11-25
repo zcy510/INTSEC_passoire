@@ -47,10 +47,12 @@ session_start();
 			$user_id = $_SESSION['user_id'];
 
 			// Fetch current user info from the database
-      $sql = "SELECT u.login, u.email, ui.birthdate, ui.location, ui.bio, ui.avatar FROM users u LEFT JOIN userinfos ui ON u.id = ui.userid WHERE u.id = \"" . $user_id . "\"";
+			$stmt = $conn->prepare("SELECT u.login, u.email, ui.birthdate, ui.location, ui.bio, ui.avatar FROM users u LEFT JOIN userinfos ui ON u.id = ui.userid WHERE u.id = ?");
+			$stmt->bind_param("i", $user_id);
+			$stmt->execute();
 
 			// Execute query
-			$result = $conn->query($sql);
+			$result = $stmt->get_result();
 
 			if ($result->num_rows > 0) {
 					// Fetch the first row of results into an array
@@ -58,6 +60,7 @@ session_start();
 			} else {
 					echo "No results found.";
 			}
+			$stmt->close();
 		}
 		?>
 		
@@ -69,12 +72,12 @@ session_start();
 					
 				<?php if (isset($_SESSION['user_id'])): ?>
 						
-					 <h4 class="w3-center"><?php echo $user['login']?></h4>
-					 <p class="w3-center"><img src="<?php echo $user['avatar']?>" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
+					 <h4 class="w3-center"><?php echo htmlspecialchars($user['login'] ?? ''); ?></h4>
+					 <p class="w3-center"><img src="<?php echo htmlspecialchars($user['avatar'] ?? '', ENT_QUOTES); ?>" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
 					 <hr>
-					 <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> <?php echo $user['bio']?></p>
-					 <p><i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> <?php echo $user['location']?></p>
-					 <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> <?php echo $user['birthdate']?></p>
+					 <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i> <?php echo htmlspecialchars($user['bio'] ?? ''); ?></p>
+					 <p><i class="fa fa-home fa-fw w3-margin-right w3-text-theme"></i> <?php echo htmlspecialchars($user['location'] ?? ''); ?></p>
+					 <p><i class="fa fa-birthday-cake fa-fw w3-margin-right w3-text-theme"></i> <?php echo htmlspecialchars($user['birthdate'] ?? ''); ?></p>
 				<?php else: ?>
 					 <h4 class="w3-center">Not Connected</h4>
 					 <hr>
@@ -113,8 +116,7 @@ session_start();
 					</div>
 				</div>
 				<!-- 
-				flag_4 is 38e6e97cefe9a4b9d032985dc789ac7f7cc6e3d1. 
-				Sometimes developpers forget important information in the source code of web pages. You can remove this flag. You can find an example of such a thing having happened here https://missouriindependent.com/2022/02/23/claim-that-reporter-hacked-state-website-was-debunked-parson-still-says-hes-a-criminal/ -->
+				You can find an example of such a thing having happened here https://missouriindependent.com/2022/02/23/claim-that-reporter-hacked-state-website-was-debunked-parson-still-says-hes-a-criminal/ -->
 			</div>
 			
 			

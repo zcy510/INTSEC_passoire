@@ -1,0 +1,9 @@
+# 禁止访问特定文件
+<Files "flag_3">
+  Require all denied
+</Files>
+
+# 禁止访问 uploads 目录
+<Directory "/full/path/to/web/uploads">
+  Require all denied
+</Directory>

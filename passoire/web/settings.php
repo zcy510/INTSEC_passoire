@@ -23,12 +23,15 @@ $stmt->execute(['user_id' => $user_id]);
 $user = $stmt->fetch();*/
 
 
-$sql = "
+$stmt = $conn->prepare("
     SELECT u.login, u.email, ui.birthdate, ui.location, ui.bio, ui.avatar 
     FROM users u
     LEFT JOIN userinfos ui ON u.id = ui.userid
-    WHERE u.id = \"" . $user_id . "\"
-";
+    WHERE u.id = ?
+");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
@@ -37,7 +40,7 @@ if ($result->num_rows > 0) {
 } else {
 		echo "No results found.";
 }
-
+$stmt->close();
 // Function to handle avatar upload
 function uploadAvatar($file, $user_id) {
     $upload_dir = 'uploads/';

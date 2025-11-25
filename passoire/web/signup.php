@@ -18,27 +18,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $password_confirm) {
         $error = "<p class=\"error\">Passwords do not match. Please try again.</p>";
     } else {
-        // Check if the login or email already exists
-        
-        $sql = "SELECT id FROM users WHERE login = '" . $login . "' OR email = '" . $email . "'";
-				$result = $conn->query($sql);
+        $login = trim($login);
+        $email = filter_var(trim($email), FILTER_VALIDATE_EMAIL);
 
-				if ($result->num_rows > 0) {
-            $error = "<p class=\"error\">Login or email already exists. Please choose a different one.</p>";
+		if (!$email) {
+            $error = "<p class=\"error\">Invalid email address.</p>";
         } else {
-            // Insert into the users table
-        
-            $pwhash = hashPassword($password);
-				    $sql = "INSERT INTO users (login, email, pwhash) VALUES ('" . $login . "', '" . $email . "', '" . $pwhash . "')";
-						$conn->query($sql);
+            // Check if the login or email already exists using prepared statement
+			$stmt = $conn->prepare("SELECT id FROM users WHERE login = ? OR email = ?");
+			$stmt->bind_param("ss", $login, $email);
+			$stmt->execute();
+			$result = $stmt->get_result();
+			if ($result->num_rows > 0) {
+                $error = "<p class=\"error\">Login or email already exists. Please choose a different one.</p>";
+                $stmt->close();
+            } else {
+                // Insert into the users table using prepared statement
+                $pwhash = hashPassword($password);
+                $stmt2 = $conn->prepare("INSERT INTO users (login, email, pwhash) VALUES (?, ?, ?)");
+                $stmt2->bind_param("sss", $login, $email, $pwhash);
+                $stmt2->execute();
+                $user_id = $conn->insert_id;
+                $stmt2->close();
 
-            // Get the newly created user ID
-						$user_id = $conn->insert_id;
-
-            // Insert into the userinfos table
-            
-				    $sql = "INSERT INTO userinfos (userid, birthdate, location, bio, avatar) VALUES (" . $user_id . ", '', '', '', '')";
-						$conn->query($sql);
+                // Insert into the userinfos table using prepared statement
+                $stmt3 = $conn->prepare("INSERT INTO userinfos (userid, birthdate, location, bio, avatar) VALUES (?, '', '', '', '')");
+                $stmt3->bind_param("i", $user_id);
+                $stmt3->execute();
+                $stmt3->close();
+                $stmt->close();
+			}
 
             $error = "<p class=\"success\">Registration successful! You can now <a href='connexion.php'>log in</a>.</p>";
         }
