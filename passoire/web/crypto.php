@@ -145,7 +145,7 @@ if (!isset($_SESSION['user_id'])) {
 			const text = document.getElementById('hashText').value;
 			const type = document.getElementById('hashType').value;
 			const hashOutput = document.getElementById('hashOutput');
-			const host = "localhost"; //LINE_TO_BE_REPLACED_XYZ
+const host = "localhost"; //LINE_TO_BE_REPLACED_XYZ
 
 			try {
 				const response = await fetch(`http://${host}:3002/hash/${type}`, {
@@ -177,7 +177,7 @@ if (!isset($_SESSION['user_id'])) {
 			const operation = document.getElementById('operationType').value;
 			const type = document.getElementById('cryptoType').value;
 			const cryptoOutput = document.getElementById('cryptoOutput');
-			const host = "localhost"; //LINE_TO_BE_REPLACED_XYZ
+const host = "localhost"; //LINE_TO_BE_REPLACED_XYZ
 
 			// Determine the correct endpoint based on operation (encrypt/decrypt)
 			const endpoint = `http://${host}:3002/${operation}/${type}`;

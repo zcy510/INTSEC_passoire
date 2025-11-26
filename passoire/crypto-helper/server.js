@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const cors = require('cors'); // Include the CORS package
 const app = express();
 const port = 3002;
@@ -31,32 +31,56 @@ app.post('/hash/:type', (req, res) => {
   const allowedHashes = ['md5', 'sha1'];
 
   if (!allowedHashes.includes(type)) {
-    return res.status(400).send({error: "Invalid hash type. Use \"md5\" or \"sha1\"."});
+    return res.status(400).send({ error: "Invalid hash type. Use \"md5\" or \"sha1\"." });
   }
-	const cmd = `echo -n "${text}" | openssl dgst -${type}`;
-  console.log(cmd);
-	
-  exec(cmd,{shell: '/bin/bash'}, (error, stdout) => {
-    if (error) {
-      return res.status(500).send({error: error.message});
+
+  const openssl = spawn('openssl', ['dgst', `-${type}`]);
+  let stdout = '';
+  let stderr = '';
+
+  openssl.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+
+  openssl.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+
+  openssl.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).send({ error: stderr || 'OpenSSL error' });
     }
     res.send({ hash: stdout.split("= ")[1].trim() });
   });
+  openssl.stdin.write(text);
+  openssl.stdin.end();
 });
 
 // DES Encrypt API
 app.post('/encrypt/des', (req, res) => {
   const { text, key } = req.body;
 
-	//const cmd =`openssl des-ecb -e -K ${key} -in <(echo "${text}") -provider legacy -provider default -base64`;
-	const cmd =`echo -n "${text}" | openssl enc -des-ecb -e -salt -base64 -k "${key}"`;
-  console.log(cmd);
-  exec(cmd,{shell: '/bin/bash'}, (error, stdout) => {
-    if (error) {
-      return res.status(500).send({error: error.message});
+
+  const openssl = spawn('openssl', ['enc', '-des-ecb', '-e', '-salt', '-base64', '-k', key]);
+  let stdout = '';
+  let stderr = '';
+
+  openssl.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+
+  openssl.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+
+  openssl.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).send({ error: stderr || 'OpenSSL error' });
     }
     res.send({ encrypted: stdout.trim() });
   });
+  openssl.stdin.write(text);
+  openssl.stdin.end();
 });
 
 // DES Decrypt API
@@ -64,49 +88,84 @@ app.post('/decrypt/des', (req, res) => {
   const { text, key } = req.body;
 
 
-	//const cmd =`openssl des-ecb -d -K ${key} -in <(echo "${text}") -provider legacy -provider default -base64`;
-	const cmd =`echo "${text}" | openssl enc -des-ecb -d -salt -base64 -k "${key}"`;
-  console.log(cmd);
-  exec(cmd,{shell: '/bin/bash'}, (error, stdout) => {
-    if (error) {
-      return res.status(500).send({error: error.message});
+  const openssl = spawn('openssl', ['enc', '-des-ecb', '-d', '-salt', '-base64', '-k', key]);
+  let stdout = '';
+  let stderr = '';
+
+  openssl.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+
+  openssl.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+
+  openssl.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).send({ error: stderr || 'OpenSSL error' });
     }
     res.send({ decrypted: stdout.trim() });
   });
+  openssl.stdin.write(text);
+  openssl.stdin.end();
 });
 
 // AES Encrypt API
 app.post('/encrypt/aes', (req, res) => {
   const { text, key } = req.body;
 
-	const cmd =`echo -n "${text}" | openssl enc -aes-256-cbc -base64 -pass pass:"${key}" -iv 00000000000000000000000000000000`;
-  console.log(cmd);
-  exec(cmd,{shell: '/bin/bash'}, (error, stdout) => {
-    if (error) {
-      return res.status(500).send({error: error.message});
+  const openssl = spawn('openssl', ['enc', '-aes-256-cbc', '-base64', '-pass', `pass:${key}`, '-iv', '00000000000000000000000000000000']);
+  let stdout = '';
+  let stderr = '';
+
+  openssl.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+
+  openssl.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+
+  openssl.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).send({ error: stderr || 'OpenSSL error' });
     }
     res.send({ encrypted: stdout.trim() });
   });
+  openssl.stdin.write(text);
+  openssl.stdin.end();
 });
 
 // AES Decrypt API
 app.post('/decrypt/aes', (req, res) => {
   const { text, key } = req.body;
 
-	const cmd =`echo "${text}" | openssl enc -aes-256-cbc -d -base64 -pass pass:"${key}" -iv 00000000000000000000000000000000`;
-  console.log(cmd);
-  exec(cmd,{shell: '/bin/bash'}, (error, stdout) => {
-    if (error) {
-      return res.status(500).send({error: error.message});
+  const openssl = spawn('openssl', ['enc', '-aes-256-cbc', '-d', '-base64', '-pass', `pass:${key}`, '-iv', '00000000000000000000000000000000']);
+  let stdout = '';
+  let stderr = '';
+
+  openssl.stdout.on('data', (data) => {
+    stdout += data.toString();
+  });
+
+  openssl.stderr.on('data', (data) => {
+    stderr += data.toString();
+  });
+
+  openssl.on('close', (code) => {
+    if (code !== 0) {
+      return res.status(500).send({ error: stderr || 'OpenSSL error' });
     }
     res.send({ decrypted: stdout.trim() });
   });
+  openssl.stdin.write(text);
+  openssl.stdin.end();
 });
 
 // Old unused API, if you see this, you can remove it.
 app.post('/flag', (req, res) => {
   const { text, key } = req.body;
-    res.send({ flag: "flag_10 is 09f7f5a05cd3733dbbaf30cce477df9a160bef6f." });
+  res.send({ flag: "flag_10 is 09f7f5a05cd3733dbbaf30cce477df9a160bef6f." });
 });
 
 // Start the server
