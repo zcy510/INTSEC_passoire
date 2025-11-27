@@ -40,9 +40,9 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`id`, `type`, `ownerid`, `date`, `path`) VALUES
-(1, 'image/svg+xml', 1, '2024-09-19 15:59:05', 'uploads/Tux.svg'),
-(2, 'application/octet-stream', 1, '2024-10-07 20:15:36', 'uploads/encrypted'),
-(3, 'application/octet-stream', 2, '2024-10-07 20:17:54', 'uploads/secret');
+(1, 'image/svg+xml', 1, '2024-09-19 15:59:05', '../uploads/Tux.svg'),
+(2, 'application/octet-stream', 1, '2024-10-07 20:15:36', '../uploads/encrypted'),
+(3, 'application/octet-stream', 2, '2024-10-07 20:17:54', '../uploads/secret');
 
 -- --------------------------------------------------------
 

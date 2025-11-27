@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $file = $_FILES['file'];
 
         // Handle file upload
-        $uploadDir = 'uploads/';
+        $uploadDir = '../uploads/';
         $uploadFile = $uploadDir . basename($file['name']);
 
         // Check if the directory exists, if not create it
