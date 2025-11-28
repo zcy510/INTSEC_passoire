@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->close();
 
             // Generate the hash for the link table
-            $hash = sha1($ownerid . basename($file['name']));
+            $salt = bin2hex(random_bytes(16)); // 生成 16 字节安全盐
+            $hash = sha1($ownerid . basename($file['name']) . $salt);
 
             // Insert the file link into the links table
             $stmt2 = $conn->prepare("INSERT INTO links (fileid, secret, hash) VALUES (?, 0, ?) ");
