@@ -9,12 +9,16 @@ if (!isset($_SESSION['user_id'])) {
 	exit();
 }
 
+if (!isset($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(16));
+}
+
 // Get user ID
 $user_id = $_SESSION['user_id'];
 error_log("DEBUG: Current user_id = " . $user_id);
 
 // Handle file deletion
-if (isset($_POST['delete']) && isset($_POST['file_id'])) {
+if (isset($_POST['delete']) && isset($_POST['file_id']) && $_POST['csrf'] === $_SESSION['csrf']) {
 	$file_id = $_POST['file_id'];
 
 	// Retrieve file path before deletion
@@ -164,6 +168,7 @@ if ($result->num_rows > 0) {
 										<!-- Delete Button -->
 										<form method="POST" action="my_files.php" style="display:inline;">
 											<input type="hidden" name="file_id" value="<?= $file['id'] ?>">
+											<input type="hidden" name="csrf" value="<?= $_SESSION['csrf'] ?>">
 											<button type="submit" class="w3-button w3-theme w3-padding" name="delete"
 												onclick="return confirm('Are you sure you want to delete this file?')">Delete</button>
 										</form>

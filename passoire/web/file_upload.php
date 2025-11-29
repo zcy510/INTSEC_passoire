@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->close();
 
             // Generate the hash for the link table
-            $salt = bin2hex(random_bytes(16)); // 生成 16 字节安全盐
+            $salt = bin2hex(random_bytes(16)); // generate 16 bytes salt
             $hash = sha1($ownerid . basename($file['name']) . $salt);
 
             // Insert the file link into the links table

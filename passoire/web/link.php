@@ -39,7 +39,9 @@ if ($file) {
     if (file_exists($file_path)) {
         // Set headers to force the file download
         header('Content-Description: File Transfer');
-        header('Content-Type: ' . $file_type);
+        header("Content-Type: application/octet-stream");
+        header("X-Content-Type-Options: nosniff");
+        //header('Content-Type: ' . $file_type);
         header('Content-Disposition: attachment; filename="' . $file_name . '"');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
